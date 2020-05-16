@@ -1,0 +1,135 @@
+from abc import ABC, abstractmethod
+
+
+class Hero:
+    def __init__(self, ball):
+        self.positive_effects = []
+        self.negative_effects = []
+        self.stats = {
+            "HP": 128,
+            "MP": 42,
+            "SP": 100,
+            "Strength": 15,
+            "Perception": 4,
+            "Endurance": 8,
+            "Charisma": 2,
+            "Intelligence": 3,
+            "Agility": 8,
+            "Luck": 1
+        }
+
+        self.ball = ball
+        if self.ball < 0:
+            self.ball = 0
+
+    def plus_ball(self):
+        self.ball += 7
+
+    def get_positive_effects(self):
+        return self.positive_effects.copy()
+
+    def get_negative_effects(self):
+        return self.negative_effects.copy()
+
+    def get_stats(self):
+        return self.stats.copy()
+
+    def proverka(self):
+        if h.ball > 13:
+            a.subscribe(b)
+            a.notify("Очки набраны!!")
+            print(b.achievements)
+            print(Storage.get_stats())
+            return ("YES!!!!")
+
+    def obnulenie(self):
+        self.ball -= 14
+
+
+class AbstractEffect(Hero, ABC):
+    def __init__(self, base):
+        self.base = base
+
+
+class AbstractPositive(AbstractEffect):
+    def get_negative_effects(self):
+        return self.base.get_negative_effects()
+
+
+class AbstractNegative(AbstractEffect):
+    def get_positive_effects(self):
+        return self.base.get_positive_effects()
+
+
+class Storage_plus(AbstractPositive):
+    def get_stats(self):
+        stats = self.base.get_stats()
+        stats["HP"] += 128
+        stats["MP"] += 42
+        stats["SP"] += 100
+        stats["Strength"] += 15
+        stats["Perception"] += 4
+        stats["Endurance"] += 8
+        stats["Charisma"] += 2
+        stats["Intelligence"] += 3
+        stats["Agility"] += 8
+        stats["Luck"] += 1
+        return stats
+
+    def get_positive_effect(self):
+        return self.base.get_positive_effect() + ["Storage_plus"]
+
+
+h = Hero(0)
+Storage = Storage_plus(h)
+
+
+class ObservableEngine():
+    def __init__(self):
+        self.__subscribers = set()
+
+    def subscribe(self, subscriber):
+        self.__subscribers.add(subscriber)
+
+    def unsubscribe(self, subscriber):
+        self.__subscribers.remove(subscriber)
+
+    def notify(self, message):
+        for subscriber in self.__subscribers:
+            subscriber.update(message)
+
+
+class AbstractObserver(ABC):
+    @abstractmethod
+    def update(self, message):
+        pass
+
+
+class ShortNotificationPrinter(AbstractObserver):
+    def __init__(self):
+        self.achievements = set()
+
+    def update(self, message):
+        self.achievements.add(message['title'])
+
+
+class FullNotificationPrinter(AbstractObserver):
+    def __init__(self):
+        self.achievements = list()
+
+    def update(self, message):
+        if message not in self.achievements:
+            self.achievements.append(message)
+
+
+a = ObservableEngine()
+b = FullNotificationPrinter()
+print(h.stats)
+print("Количество очков:", h.ball)
+h.plus_ball()
+print("Количество очков:", h.ball)
+h.plus_ball()
+print("Количество очков:", h.ball)
+print(h.proverka())
+h.obnulenie()
+print("Количество очков:", h.ball)
